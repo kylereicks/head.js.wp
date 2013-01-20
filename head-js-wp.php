@@ -32,6 +32,9 @@ if(!class_exists('Head_js_wp')){
 //      print_r($wp_scripts);
 
       if(!empty($wp_scripts->in_footer)){
+        foreach($wp_scripts->in_footer as $handle){
+          $wp_scripts->print_extra_script($handle);
+        }
         echo '<script>' . "\n" . 'head.js(';
         foreach($wp_scripts->in_footer as $script){
           $ending = ($wp_scripts->in_footer[count($wp_scripts->in_footer) - 1] == $script) ? ');' : ',';
