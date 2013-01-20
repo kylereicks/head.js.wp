@@ -23,15 +23,13 @@ if(!class_exists('Head_js_wp')){
         wp_register_script('head-js', plugins_url('/js/libs/head.load.js', __FILE__));
       }
 
-        wp_enqueue_script('head-js');
     }
 
     function print_scripts_with_header_js(){
       global $wp_scripts;
 
-//      print_r($wp_scripts);
-
       if(!empty($wp_scripts->in_footer)){
+        $wp_scripts->do_item('head-js');
         foreach($wp_scripts->in_footer as $handle){
           $wp_scripts->print_extra_script($handle);
         }
@@ -40,7 +38,7 @@ if(!class_exists('Head_js_wp')){
           $ending = ($wp_scripts->in_footer[count($wp_scripts->in_footer) - 1] == $script) ? ');' : ',';
           echo "'" . $wp_scripts->registered[$script]->src . "'" . $ending;
         }
-        echo '</script>';
+        echo '</script>' . "\n";
       }
 
     }
