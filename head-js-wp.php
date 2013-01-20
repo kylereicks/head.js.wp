@@ -32,17 +32,21 @@ if(!class_exists('Head_js_wp')){
 
       if(!empty($wp_scripts->in_footer)){
         $wp_scripts->do_item('head-js');
-        foreach($wp_scripts->in_footer as $handle){
+        $wp_scripts->all_deps($wp_scripts->in_footer);
+//        print_r($wp_scripts);
+        foreach($wp_scripts->to_do as $handle){
           $wp_scripts->print_extra_script($handle);
         }
-        echo '<script>' . "\n" . 'head.js(';
+        echo '<script>' . "\n" . 'head.js({';
         foreach($wp_scripts->in_footer as $script){
-          $ending = ($wp_scripts->in_footer[count($wp_scripts->in_footer) - 1] == $script) ? ');' : ',';
-          echo "'" . $wp_scripts->registered[$script]->src . "'" . $ending;
+          $ending = ($wp_scripts->in_footer[count($wp_scripts->in_footer) - 1] == $script) ? ' });' : " },\n{";
+          echo " $script : '" . $wp_scripts->registered[$script]->src . "'" . $ending;
+          $wp_scripts->done[] = $script;
         }
         echo '</script>' . "\n";
       }
 
+      return true;
     }
   }/* End class Head_js_wp */
   $head_js_wp = new Head_js_wp();
