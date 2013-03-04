@@ -43,7 +43,8 @@ if(!class_exists('Head_js_wp')){
         foreach($wp_scripts->in_footer as $script){
           $ending = ($wp_scripts->in_footer[count($wp_scripts->in_footer) - 1] == $script) ? ' });' : " },\n{";
           $version = ($wp_scripts->registered[$script]->ver) ? '?ver=' . $wp_scripts->registered[$script]->ver : "";
-          echo " $script : '" . $wp_scripts->registered[$script]->src . $version . "'" . $ending;
+          $base_url = (preg_match('/^\//', $wp_scripts->registered[$script]->src)) ? $wp_scripts->base_url : '';
+          echo str_replace('-', '_', $script) . " : '" . $base_url . $wp_scripts->registered[$script]->src . $version . "'" . $ending;
           $wp_scripts->done[] = $script;
           $wp_scripts->to_do = array_merge(array_diff($wp_scripts->to_do, array($script)));
         }
