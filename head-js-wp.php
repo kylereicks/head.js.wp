@@ -12,7 +12,7 @@ if(!class_exists('Head_js_wp')){
   class Head_js_wp{
 
     function __construct(){
-      add_action('wp_enqueue_scripts', array($this, 'add_header_js_to_head'), 11);
+      add_action('wp_enqueue_scripts', array($this, 'add_header_js_to_head'));
       remove_action('wp_print_footer_scripts', '_wp_footer_scripts');
       add_action('wp_print_footer_scripts', array($this, 'print_scripts_with_header_js'));
     }
@@ -30,18 +30,18 @@ if(!class_exists('Head_js_wp')){
 
       print_late_styles();
 
-      if(!empty($wp_scripts->in_footer)){
+      $wp_scripts->all_deps($wp_scripts->queue);
+
+      if(!empty($wp_scripts->to_do)){
         $wp_scripts->do_item('head-js');
 
-        $wp_scripts->all_deps($wp_scripts->in_footer);
-
-        foreach($wp_scripts->in_footer as $handle){
+        foreach($wp_scripts->to_do as $handle){
           $wp_scripts->print_extra_script($handle);
         }
         
         echo '<script>' . "\n" . 'head.js({';
-        foreach($wp_scripts->in_footer as $script){
-          $ending = ($wp_scripts->in_footer[count($wp_scripts->in_footer) - 1] == $script) ? ' });' : " },\n{";
+        foreach($wp_scripts->to_do as $script){
+          $ending = (count($wp_scripts->to_do) === 1) ? ' });' : " },\n{";
           $version = ($wp_scripts->registered[$script]->ver) ? '?ver=' . $wp_scripts->registered[$script]->ver : "";
           $base_url = (preg_match('/^\//', $wp_scripts->registered[$script]->src)) ? $wp_scripts->base_url : '';
           echo str_replace('-', '_', $script) . " : '" . $base_url . $wp_scripts->registered[$script]->src . $version . "'" . $ending;
