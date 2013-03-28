@@ -12,9 +12,11 @@ if(!class_exists('Head_js_wp')){
   class Head_js_wp{
 
     function __construct(){
-      add_action('wp_enqueue_scripts', array($this, 'add_header_js_to_head'));
-      remove_action('wp_print_footer_scripts', '_wp_footer_scripts');
-      add_action('wp_print_footer_scripts', array($this, 'print_scripts_with_header_js'));
+      if(!is_admin()){
+        add_action('wp_enqueue_scripts', array($this, 'add_header_js_to_head'));
+        remove_action('wp_print_footer_scripts', '_wp_footer_scripts');
+        add_action('wp_print_footer_scripts', array($this, 'print_scripts_with_header_js'));
+      }
     }
 
     function add_header_js_to_head(){
@@ -30,7 +32,9 @@ if(!class_exists('Head_js_wp')){
 
       print_late_styles();
 
-      $wp_scripts->all_deps($wp_scripts->queue);
+      if(!empty($wp_scripts->queue)){
+        $wp_scripts->all_deps($wp_scripts->queue);
+      }
 
       if(!empty($wp_scripts->to_do)){
         $wp_scripts->do_item('head-js');
