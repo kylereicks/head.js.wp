@@ -30,8 +30,6 @@ if(!class_exists('Head_js_wp')){
     function print_scripts_with_header_js(){
       global $wp_scripts;
 
-      $script_trees = array();
-
       print_late_styles();
 
       if(!empty($wp_scripts->queue)){
@@ -45,38 +43,13 @@ if(!class_exists('Head_js_wp')){
           $wp_scripts->print_extra_script($handle);
         }
 
-        foreach($wp_scripts->to_do as $script){
-          if(empty($wp_scripts->registered[$script]->deps)){
-            $script_trees[] = array(
-              $script
-            );
-          }else{
-            foreach($script_trees as $number => $tree){
-              foreach($tree as $tree_script){
-                if(in_array($tree_script, $wp_scripts->registered[$script]->deps) && !in_array($script, $script_trees[$number])){
-                  $script_trees[$number][] = $script;
-                }
-              }
-            }
-          }
-        }
-
-        foreach($script_trees as  $number => $tree){
-          if(isset($script_trees[$number]) && isset($script_trees[$number + 1])){
-            $intersect = array_intersect($script_trees[$number], $script_trees[$number +1]);
-            if(!empty($intersect)){
-              $script_trees[$number] = array_diff($script_trees[$number], $intersect);
-              $script_trees[$number] = array_merge($script_trees[$number], $script_trees[$number + 1]);
-              unset($script_trees[$number + 1]);
-            }
-          }
-        }
+        $script_queues = $this->queue_scripts($wp_scripts);
 
         echo '<script>' . "\n" . 'head';
-        foreach($script_trees as $tree){
+        foreach($script_queues as $queue){
           echo '.js({';
-          foreach($tree as $number => $script){
-            $ending = (count($tree) === $number + 1) ? ' })' : " },\n{";
+          foreach($queue as $number => $script){
+            $ending = (count($queue) === $number + 1) ? ' })' : " },\n{";
             $version = ($wp_scripts->registered[$script]->ver) ? '?ver=' . $wp_scripts->registered[$script]->ver : "";
             $base_url = (preg_match('/^\//', $wp_scripts->registered[$script]->src)) ? $wp_scripts->base_url : '';
             echo str_replace('-', '_', $script) . " : '" . $base_url . $wp_scripts->registered[$script]->src . $version . "'" . $ending;
@@ -89,6 +62,39 @@ if(!class_exists('Head_js_wp')){
       }else{
         return false;
       }
+    }
+
+    private function queue_scripts($wp_scripts){
+      $script_queues = array();
+
+      foreach($wp_scripts->to_do as $script){
+        if(empty($wp_scripts->registered[$script]->deps)){
+          $script_queues[] = array(
+            $script
+          );
+        }else{
+          foreach($script_queues as $number => $queue){
+            foreach($queue as $queue_script){
+              if(in_array($queue_script, $wp_scripts->registered[$script]->deps) && !in_array($script, $script_queues[$number])){
+                $script_queues[$number][] = $script;
+              }
+            }
+          }
+        }
+      }
+
+      foreach($script_queues as  $number => $queue){
+        if(isset($script_queues[$number]) && isset($script_queues[$number + 1])){
+          $intersect = array_intersect($script_queues[$number], $script_queues[$number +1]);
+          if(!empty($intersect)){
+            $script_queues[$number] = array_diff($script_queues[$number], $intersect);
+            $script_queues[$number] = array_merge($script_queues[$number], $script_queues[$number + 1]);
+            unset($script_queues[$number + 1]);
+          }
+        }
+      }
+
+      return $script_queues;
     }
   }/* End class Head_js_wp */
   $head_js_wp = new Head_js_wp();
