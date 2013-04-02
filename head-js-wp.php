@@ -84,12 +84,14 @@ if(!class_exists('Head_js_wp')){
       }
 
       foreach($script_queues as  $number => $queue){
-        if(isset($script_queues[$number]) && isset($script_queues[$number + 1])){
-          $intersect = array_intersect($script_queues[$number], $script_queues[$number +1]);
-          if(!empty($intersect)){
-            $script_queues[$number] = array_diff($script_queues[$number], $intersect);
-            $script_queues[$number] = array_merge($script_queues[$number], $script_queues[$number + 1]);
-            unset($script_queues[$number + 1]);
+        foreach($script_queues as $number_check => $queue_check){
+          if($number > $number_check){
+            $intersect = array_intersect($script_queues[$number], $script_queues[$number_check]);
+            if(!empty($intersect)){
+              $script_queues[$number] = array_diff($script_queues[$number], $intersect);
+              $script_queues[$number] = array_merge($script_queues[$number], $script_queues[$number_check]);
+              unset($script_queues[$number_check]);
+            }
           }
         }
       }
