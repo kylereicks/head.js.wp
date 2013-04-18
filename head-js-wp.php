@@ -4,7 +4,7 @@ Plugin Name: Head.js.wp
 Plugin URI: http://github.com/kylereicks/head.js.wp
 Description: A plugin to load footer scripts with head.js
 Author: Kyle Reicks
-Version: 0.0
+Version: 1.0
 Author URI: http://github.com/kylereicks/
 */
 
