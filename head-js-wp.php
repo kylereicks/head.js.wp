@@ -47,9 +47,9 @@ if(!class_exists('Head_js_wp')){
 
         echo '<script>' . "\n" . 'head';
         foreach($script_queues as $queue){
-          echo '.js({';
+          echo "\n" . '.js({';
           foreach($queue as $number => $script){
-            $ending = (count($queue) === $number + 1) ? ' })' : " },\n{";
+            $ending = (count($queue) === $number + 1) ? '})' : "},\n{";
             $version = ($wp_scripts->registered[$script]->ver) ? '?ver=' . $wp_scripts->registered[$script]->ver : "";
             $base_url = (preg_match('/^\//', $wp_scripts->registered[$script]->src)) ? $wp_scripts->base_url : '';
             echo str_replace('-', '_', $script) . " : '" . $base_url . $wp_scripts->registered[$script]->src . $version . "'" . $ending;
