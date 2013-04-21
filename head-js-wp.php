@@ -20,11 +20,9 @@ if(!class_exists('Head_js_wp')){
     }
 
     function add_header_js_to_head(){
-
       if(!wp_script_is('head-js')){
         wp_register_script('head-js', plugins_url('/js/libs/head.load.js', __FILE__));
       }
-
     }
 
     function print_scripts_with_header_js(){
@@ -95,7 +93,6 @@ if(!class_exists('Head_js_wp')){
           }
         }
       }
-
       return $script_queues;
     }
   }/* End class Head_js_wp */
