@@ -29,6 +29,16 @@ Head.WP assumes that scripts are loaded via `wp_enqueue_scipt()` and that any sc
 
 There aren't any, but the plugin counts on scripts being properly enqueued in the footer with correctly listed dependencies. [See wp_enqueue_script in the Codex](http://codex.wordpress.org/Function_Reference/wp_enqueue_script).
 
+= Why are my site's scripts still loading conventionally (without head.js)? =
+
+There are a few reasons why a script might still be loaded conventionally.
+* Head.WP ignores any scripts that are not added via `wp_enqueue_script()`.
+* Head.WP only works with scripts enqueued in the footer, it assumes that any script enqueued in the `<head>` intends to block the rest of the rest of the page from loading until it is finished.
+
+= Why are my other scripts not working as expected? =
+
+If a script has no dependencies, head.js will execute that script as soon it is loaded. To ensure that scripts are executed in the correct order, make sure to list all required dependencies in `wp_enqueue_script()`.
+
 = Is this plugin on GitHub? =
 
 Yes it is. [Head.WP](https://github.com/kylereicks/head.js.wp)
