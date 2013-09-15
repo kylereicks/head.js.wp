@@ -40,11 +40,20 @@ if(!class_exists('Head_js_wp')){
 
     private function __construct(){
       if(!is_admin()){
+        // Enqueue scripts
         add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
+
+        // Replace _wp_footer_scripts
         remove_action('wp_print_footer_scripts', '_wp_footer_scripts');
         add_action('wp_print_footer_scripts', array($this, 'print_footer_scripts'));
-        add_shortcode('enqueue_style', array($this, 'shortcode_enqueue_style'));
-        add_shortcode('enqueue_script', array($this, 'shortcode_enqueue_script'));
+
+        // Add helper shortcodes
+        if(!shortcode_exists('enqueue_style')){
+          add_shortcode('enqueue_style', array($this, 'shortcode_enqueue_style'));
+        }
+        if(!shortcode_exists('enqueue_script')){
+          add_shortcode('enqueue_script', array($this, 'shortcode_enqueue_script'));
+        }
       }
     }
 
