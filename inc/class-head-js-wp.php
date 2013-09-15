@@ -43,6 +43,8 @@ if(!class_exists('Head_js_wp')){
         add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
         remove_action('wp_print_footer_scripts', '_wp_footer_scripts');
         add_action('wp_print_footer_scripts', array($this, 'print_footer_scripts'));
+        add_shortcode('enqueue_style', array($this, 'shortcode_enqueue_style'));
+        add_shortcode('enqueue_script', array($this, 'shortcode_enqueue_script'));
       }
     }
 
@@ -91,6 +93,38 @@ if(!class_exists('Head_js_wp')){
         return true;
       }else{
         return false;
+      }
+    }
+
+    public function shortcode_enqueue_style($atts){
+      extract(shortcode_atts(array(
+        'handle' => '',
+        'src' => '',
+        'deps' => '',
+        'ver' => false,
+        'media' => 'all'
+      ), $atts));
+
+      if(!empty($handle) && empty($src)){
+        wp_enqueue_style($handle);
+      }elseif(!empty($handle) && !empty($src)){
+        wp_enqueue_style($handle, $src, array($deps), $ver, $media);
+      }
+    }
+
+    public function shortcode_enqueue_script($atts){
+      extract(shortcode_atts(array(
+        'handle' => '',
+        'src' => '',
+        'deps' => '',
+        'ver' => false,
+        'in_footer' => false
+      ), $atts));
+
+      if(!empty($handle) && empty($src)){
+        wp_enqueue_script($handle);
+      }elseif(!empty($handle) && !empty($src)){
+        wp_enqueue_script($handle, $src, array($deps), $ver, $media);
       }
     }
 
