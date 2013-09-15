@@ -25,31 +25,45 @@ if(!class_exists('Head_js_wp')){
       return null;
     }
 
+    private static function async_load($document, $tag, $url, $type = false, $rel = false, $media = false, $callback = false){
+      $output = '(function(doc, tag, url, type, rel, media){';
+      $output .= 'var resource = doc.createElement(tag);';
+      $output .= !empty($type) ? 'resource.type = type;' : '';
+      $output .= !empty($rel) ? 'resource.rel = rel;' : '';
+      $output .= !empty($media) ? 'resource.media = media;' : '';
+      $output .= 'script' === $tag ? 'resource.src = url;' : 'resource.href = url;';
+      $output .= !empty($callback) ? 'resource.addEventListener(\'load\', function(){' . $callback . '();}, false);' : '';
+      $output .= 'doc.getElementsByTagName(\'head\')[0].appendChild(resource);';
+      $output .= '}(' . $document . ', \'' . $tag . '\', \'' . $url . '\', \'' . $type . '\', \'' . $rel . '\', \'' . $media . '\'));';
+      return $output;
+    }
+
     private function __construct(){
       if(!is_admin()){
-        add_action('wp_enqueue_scripts', array($this, 'add_header_js_to_head'));
+        add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
         remove_action('wp_print_footer_scripts', '_wp_footer_scripts');
-        add_action('wp_print_footer_scripts', array($this, 'print_scripts_with_header_js'));
+        add_action('wp_print_footer_scripts', array($this, 'print_footer_scripts'));
       }
     }
 
-    public function add_header_js_to_head(){
-      if(!wp_script_is('head-js')){
-        wp_register_script('head-js', HEAD_JS_WP_URL . '/js/libs/head.load.js');
+    public function enqueue_scripts(){
+      if(!wp_script_is('head-loader') || !wp_script_is('head-js') || !wp_script_is('head')){
+        wp_register_script('head-loader', HEAD_JS_WP_URL . '/js/libs/head.load.min.js', array(), HEAD_JS_VERSION, true);
       }
     }
 
-    public function print_scripts_with_header_js(){
-      global $wp_scripts;
-
-      print_late_styles();
+    public function print_footer_scripts(){
+      global $wp_scripts, $wp_styles;
 
       if(!empty($wp_scripts->queue)){
         $wp_scripts->all_deps($wp_scripts->queue);
       }
 
-      if(!empty($wp_scripts->to_do)){
-        $wp_scripts->do_item('head-js');
+      if(!empty($wp_styles->queue)){
+        $wp_styles->all_deps($wp_styles->queue);
+      }
+
+      if(!empty($wp_scripts->to_do) || !empty($wp_styles->to_do)){
 
         foreach($wp_scripts->to_do as $handle){
           $wp_scripts->print_extra_script($handle);
@@ -57,7 +71,11 @@ if(!class_exists('Head_js_wp')){
 
         $script_queues = $this->queue_scripts($wp_scripts);
 
-        echo '<script>' . "\n" . 'head';
+        echo '<script>' . "\n";
+        echo $this->print_late_styles($wp_styles) . "\n";
+        echo self::async_load('document', 'script', $wp_scripts->registered['head-loader']->src, 'text/javascript', false, false, 'init_head_load') . "\n";
+        echo 'var init_head_load = function(){';
+        echo 'head';
         foreach($script_queues as $queue){
           echo "\n" . '.js({';
           foreach($queue as $number => $script){
@@ -69,11 +87,23 @@ if(!class_exists('Head_js_wp')){
             $wp_scripts->to_do = array_merge(array_diff($wp_scripts->to_do, array($script)));
           }
         }
-        echo ';' . "\n" . '</script>' . "\n";
+        echo ';' . "\n" . '};</script>' . "\n";
         return true;
       }else{
         return false;
       }
+    }
+
+    private function print_late_styles($wp_styles){
+      if(empty($wp_styles->to_do)){
+        return false;
+      }
+      $output = '';
+      foreach($wp_styles->to_do as $style){
+        $output .= self::async_load('document', 'link', $wp_styles->registered[$style]->src, 'text/css', 'stylesheet', $wp_styles->registered[$style]->args, false);
+      }
+
+      return $output;
     }
 
     private function queue_scripts($wp_scripts){
