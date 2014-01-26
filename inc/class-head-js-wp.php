@@ -2,6 +2,8 @@
 if(!class_exists('Head_js_wp')){
   class Head_js_wp{
 
+    private $deferred_resources = array();
+
     // Setup singleton pattern
     public static function get_instance(){
       static $instance;
@@ -35,6 +37,41 @@ if(!class_exists('Head_js_wp')){
       $output .= !empty($callback) ? 'resource.addEventListener(\'load\', function(){' . $callback . '();}, false);' : '';
       $output .= 'doc.getElementsByTagName(\'head\')[0].appendChild(resource);';
       $output .= '}(' . $document . ', \'' . $tag . '\', \'' . $url . '\', \'' . $type . '\', \'' . $rel . '\', \'' . $media . '\'));';
+      return $output;
+    }
+
+    private function deferred_resource_loader(){
+      $output = '';
+      $output .= 'var loadDeferredResources = function(){';
+      $output .= 'var resources = [';
+      foreach($this->deferred_resources as $resource){
+        $output .= '{';
+        foreach($resource as $attr => $value){
+          $output .= $attr . ':\'' . $value . '\',';
+        }
+        $output = rtrim($output, ',');
+        $output .= '},';
+
+      }
+      $output = rtrim($output, ',');
+      $output .= '];';
+      $output .= 'for(var i = 0, ri = resources.length; i < ri; i++){';
+      $output .= 'var resource = document.createElement(resources[i].tag);';
+      $output .= 'if(resources[i].type){resource.type = resources[i].type;}';
+      $output .= 'if(resources[i].rel){resource.rel = resources[i].rel;}';
+      $output .= 'if(resources[i].media){resource.media = resources[i].media;}';
+      $output .= 'if(\'script\' === resources[i].tag){resource.src = resources[i].url;}else{resource.href = resources[i].url;}';
+      $output .= 'if(resources[i].callback){resource.addEventListener(\'load\', window[resources[i].callback], false);}';
+      $output .= 'document.getElementsByTagName(\'head\')[0].appendChild(resource);';
+      $output .= '}';
+      $output .= '};';
+      $output .= 'if(window.addEventListener){';
+      $output .= 'window.addEventListener("load", loadDeferredResources, false);';
+      $output .= '}else if(window.attachEvent){';
+      $output .= 'window.attachEvent("onload", loadDeferredResources);';
+      $output .= '}else{';
+      $output .= 'window.onload = loadDeferredResources;';
+      $output .= '}' . "\n";
       return $output;
     }
 
@@ -83,8 +120,14 @@ if(!class_exists('Head_js_wp')){
         $script_queues = $this->queue_scripts($wp_scripts);
 
         echo '<script>' . "\n";
-        echo $this->print_late_styles($wp_styles) . "\n";
-        echo self::async_load('document', 'script', $wp_scripts->registered['head-loader']->src, 'text/javascript', false, false, 'init_head_load') . "\n";
+        $this->queue_late_styles($wp_styles) . "\n";
+        $this->deferred_resources[] = array(
+          'tag' => 'script',
+          'url' => $wp_scripts->registered['head-loader']->src,
+          'type' => 'text/javascript',
+          'callback' => 'init_head_load'
+        );
+        echo $this->deferred_resource_loader();
         echo 'var init_head_load = function(){';
         echo 'head';
         foreach($script_queues as $queue){
@@ -137,31 +180,38 @@ if(!class_exists('Head_js_wp')){
       }
     }
 
-    private function print_late_styles($wp_styles){
+    private function queue_late_styles($wp_styles){
       if(empty($wp_styles->to_do)){
         return false;
       }
-      $output = '';
       foreach($wp_styles->to_do as $style){
-        $output .= self::async_load('document', 'link', $wp_styles->registered[$style]->src, 'text/css', 'stylesheet', $wp_styles->registered[$style]->args, false);
+        $this->deferred_resources[] = array(
+          'tag' => 'link',
+          'url' => $wp_styles->registered[$style]->src,
+          'type' => 'text/css',
+          'rel' => 'stylesheet',
+          'media' => $wp_styles->registered[$style]->args
+        );
       }
 
-      return $output;
+      return true;
     }
 
     private function queue_scripts($wp_scripts){
       $script_queues = array();
 
       foreach($wp_scripts->to_do as $script){
-        if(empty($wp_scripts->registered[$script]->deps)){
-          $script_queues[] = array(
-            $script
-          );
-        }else{
-          foreach($script_queues as $number => $queue){
-            foreach($queue as $queue_script){
-              if(in_array($queue_script, $wp_scripts->registered[$script]->deps) && !in_array($script, $script_queues[$number])){
-                $script_queues[$number][] = $script;
+        if(!in_array($script, $wp_scripts->done)){
+          if(!in_array($script, $wp_scripts->done) && empty($wp_scripts->registered[$script]->deps) || $this->deps_done($script, $wp_scripts)){
+            $script_queues[] = array(
+              $script
+            );
+          }else{
+            foreach($script_queues as $number => $queue){
+              foreach($queue as $queue_script){
+                if(in_array($queue_script, $wp_scripts->registered[$script]->deps) && !in_array($script, $script_queues[$number])){
+                  $script_queues[$number][] = $script;
+                }
               }
             }
           }
@@ -181,6 +231,15 @@ if(!class_exists('Head_js_wp')){
         }
       }
       return $script_queues;
+    }
+
+    private function deps_done($script, $wp_scripts){
+      foreach($wp_scripts->registered[$script]->deps as $dep){
+        if(!in_array($dep, $wp_scripts->done)){
+          return false;
+        }
+      }
+      return true;
     }
   }
 }
