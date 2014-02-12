@@ -1,5 +1,4 @@
-head.ready([
-<?php
+head.ready([<?php
 $max = count($item['deps']);
 foreach($item['deps'] as $index => $dep){
   echo "'" . $dep . "'";
@@ -9,7 +8,7 @@ foreach($item['deps'] as $index => $dep){
 }
 ?>
 ], function(){
-<?php
-  self::render_template('head-load', array('model' => $model, 'item' => $item));
-?>
-});
+    <?php
+      self::render_template('head-load', array('model' => $model, 'item' => $item));
+    ?>
+  });
