@@ -9,8 +9,6 @@ if(!class_exists('View_Head_JS_WP')){
         $wp_scripts->print_extra_script($handle);
       }
 
-//      $wp_scripts->do_item('head-load');
-
       self::render_template('inline-script', array('model' => $model, 'head_src' => $wp_scripts->registered['head-load']->src));
     }
 

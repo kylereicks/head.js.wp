@@ -1,0 +1,1 @@
+(function(w,d){var s=d.createElement('script');s.type='text/javascript';s.src='<?php echo $src; ?>';if(s.addEventListener){s.addEventListener('load', function(){<?php echo $callback; ?>();},false);}else if(s.attachEvent){s.attachEvent('onload',function(){<?php echo $callback; ?>();});}d.getElementsByTagName('head')[0].appendChild(s);}(this, document));
