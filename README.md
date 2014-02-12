@@ -1,7 +1,7 @@
 Head.js.wp Plugin
 =================
 
-A plugin to load all footer scripts with [head.js](https://github.com/headjs/headjs).
+A plugin to load all footer scripts and styles with [head.js](https://github.com/headjs/headjs).
 
 Details
 -------

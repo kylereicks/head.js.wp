@@ -3,20 +3,20 @@ Contributors: kylereicks
 Donate link: http://shakopee.dollarsforscholars.org/
 Tags: script loading, asynchronous, javascript, async, headJS, head.js, enqueue, wp_enqueue_script
 Requires at least: 3.2
-Tested up to: 3.5.1
-Stable tag: 1.0
+Tested up to: 3.8.1
+Stable tag: 2.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-A plugin to load all footer scripts with [head.js](https://github.com/headjs/headjs).
+A plugin to load all footer scripts and styles with [head.js](https://github.com/headjs/headjs).
 
 == Description ==
 
-Head.js is a script to asynchronously load and optionally asynchronously execute javascript assets.
+Head.js is a script to asynchronously load and manage dependencies of javascript and CSS assets.
 
-This plugin loads the scripts enqueued in footer with the head.js loader. All of the footer scripts are loaded asynchronously and any scripts that do not share dependencies are executed asynchronously while scripts that share dependencies are executed in order.
+This plugin loads the scripts and styles enqueued in footer with the head.js loader. It does not include head.js' feature detection. 
 
-Head.WP assumes that scripts are loaded via `wp_enqueue_script()` and that any script enqueued in the `<head>` intends to be loaded before the rest of the page.
+Head.js.wp assumes that scripts are loaded via `wp_enqueue_script()` and that any script enqueued in the `<head>` intends to be loaded before the rest of the page.
 
 == Installation ==
 
@@ -47,10 +47,14 @@ Yes it is. [Head.WP](https://github.com/kylereicks/head.js.wp)
 
 == Changelog ==
 
+= 2.0.0 =
+* A complete rewrite. It really is much nicer now.
+* Update to head.js version 1.0.3
+
 = 1.0 =
 * Release 1.0.
 
 == Upgrade Notice ==
 
-= 1.0 =
-This is the initial public release.
+= 2.0 =
+This is a complete rewrite of the 1.0 release. I don't forsee any upgrading problems, but if you have made any customizations to the plugin or it's functionality, please test before updating a live site.
