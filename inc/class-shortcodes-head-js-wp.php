@@ -4,10 +4,10 @@ if(!class_exists('Shortcodes_Head_JS_WP')){
 
     public static function add_shortcodes(){
       if(!shortcode_exists('enqueue_style')){
-        add_shortcode('enqueue_style', array(self, 'shortcode_enqueue_style'));
+        add_shortcode('enqueue_style', array('Shortcodes_Head_JS_WP', 'shortcode_enqueue_style'));
       }
       if(!shortcode_exists('enqueue_script')){
-        add_shortcode('enqueue_script', array(self, 'shortcode_enqueue_script'));
+        add_shortcode('enqueue_script', array('Shortcodes_Head_JS_WP', 'shortcode_enqueue_script'));
       }
     }
 
