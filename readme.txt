@@ -4,7 +4,7 @@ Donate link: http://shakopee.dollarsforscholars.org/
 Tags: script loading, asynchronous, javascript, async, headJS, head.js, enqueue, wp_enqueue_script
 Requires at least: 3.2
 Tested up to: 3.8.1
-Stable tag: 2.0.0
+Stable tag: 2.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -46,6 +46,10 @@ Yes it is. [Head.WP](https://github.com/kylereicks/head.js.wp)
 == Screenshots ==
 
 == Changelog ==
+
+= 2.0.1 =
+* Hotfix. Fix warning in shortcode class.
+* Add head.min and head.map to the svn repo.
 
 = 2.0.0 =
 * A complete rewrite. It really is much nicer now.
