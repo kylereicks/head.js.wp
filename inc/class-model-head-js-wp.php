@@ -16,7 +16,13 @@ if(!class_exists('Model_Head_JS_WP')){
         $wp_styles->all_deps($wp_styles->queue);
       }
 
-      $this->in_head = array_merge($wp_styles->done, $wp_scripts->done);
+      if(!empty($wp_styles->done)){
+        $this->in_head = array_merge($this->in_head, $wp_styles->done);
+      }
+
+      if(!empty($wp_scripts->done)){
+        $this->in_head = array_merge($this->in_head, $wp_scripts->done);
+      }
       $this->set_queue();
     }
 
