@@ -61,9 +61,11 @@ if(!class_exists('Head_JS_WP')){
 
       $this->model = new Model_Head_JS_WP();
 
-      include_once(HEAD_JS_WP_PATH . 'inc/class-view-head-js-wp.php');
+      if(!empty($this->model->queue)){
+        include_once(HEAD_JS_WP_PATH . 'inc/class-view-head-js-wp.php');
 
-      View_Head_JS_WP::do_items($this->model);
+        View_Head_JS_WP::do_items($this->model);
+      }
     }
   }
 }
