@@ -5,8 +5,8 @@ if(!class_exists('View_Head_JS_WP')){
     public static function do_items($model){
       global $wp_scripts;
 
-      foreach($model->queue as $handle => $src){
-        $wp_scripts->print_extra_script($handle);
+      foreach($model->queue as $script){
+        $wp_scripts->print_extra_script($script['handle']);
       }
 
       self::render_template('inline-script', array('model' => $model, 'head_src' => $wp_scripts->registered['head-load']->src));
