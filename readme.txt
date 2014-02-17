@@ -4,7 +4,7 @@ Donate link: http://shakopee.dollarsforscholars.org/
 Tags: script loading, asynchronous, javascript, async, headJS, head.js, enqueue, wp_enqueue_script
 Requires at least: 3.2
 Tested up to: 3.8.1
-Stable tag: 2.0.2
+Stable tag: 2.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,9 @@ Yes it is. [Head.WP](https://github.com/kylereicks/head.js.wp)
 
 == Changelog ==
 
+= 2.0.3 =
+* Fix reference error when localizing scripts.
+
 = 2.0.2 =
 * Fix warning on log-in page.
 * Remove output when no scripts need to be loaded.
@@ -64,5 +67,5 @@ Yes it is. [Head.WP](https://github.com/kylereicks/head.js.wp)
 
 == Upgrade Notice ==
 
-= 2.0.2 =
-Bug fix update. Cleans up warning on the log-in page and supress output when no scripts need to be loaded.
+= 2.0.3 =
+Bug fix update. Cleans up reference error when localizing scripts.
